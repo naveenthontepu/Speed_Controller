@@ -18,10 +18,15 @@ public class DisplaySpeed extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_speed);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        pref = getSharedPreferences("naveen.speedcontroller",MODE_PRIVATE);
+        pref = getSharedPreferences("naveen.speedcontroller", MODE_PRIVATE);
         editor = pref.edit();
         startButton = (Button)findViewById(R.id.startButton);
         stopButton = (Button)findViewById(R.id.stopButton);
+        if(pref.getInt("servicevariable",1)==1){
+            stopButton.setEnabled(false);
+        }else if(pref.getInt("servicevariable",1)==2){
+            startButton.setEnabled(false);
+        }
 
     }
 
@@ -41,5 +46,7 @@ public class DisplaySpeed extends AppCompatActivity {
         startButton.setEnabled(true);
         stopButton.setEnabled(false);
         stopService(intent);
+        editor.putInt("servicevariable",1);
+        editor.commit();
     }
 }
