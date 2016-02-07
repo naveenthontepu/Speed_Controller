@@ -35,10 +35,13 @@ public class DisplaySpeed extends AppCompatActivity {
         super.onResume();
         distance = (TextView)findViewById(R.id.distance);
         distance.setText("Distance: "+session.getDistance_total());
+        Log.i("distance","service variable = "+session.getServicevariable());
         if(session.getServicevariable()==1){
             stopButton.setEnabled(false);
+            startButton.setEnabled(true);
         }else if(session.getServicevariable()==2){
             startButton.setEnabled(false);
+            stopButton.setEnabled(true);
             startTimer();
         }
     }
@@ -83,6 +86,9 @@ public class DisplaySpeed extends AppCompatActivity {
             mytimer.cancel();
             mytimer=null;
         }
+        session.setDistance_total(0.0f);
+        session.setPrevious_lat(-200.0f);
+        session.setPrevious_long(-200.0f);
     }
 
     @Override
