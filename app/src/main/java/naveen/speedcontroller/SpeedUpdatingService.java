@@ -14,9 +14,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,6 +81,16 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
         mLocationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
         mLocationRequest.setFastestInterval(FASTEST_LOCATION_UPDATE_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder b = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
+        b.setAlwaysShow(true);
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,b.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult locationSettingsResult) {
+                Log.i(TAG,"location result = "+locationSettingsResult.getStatus());
+            }
+        });
+
     }
 
 
@@ -150,10 +164,8 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
 
         if (dis_btw_latlong>10&&dis_btw_latlong<40*seconds_count&&location.getSpeed()>.8){
 //            &&location.getSpeed()>0.5
-            session.setPrevious_lat((float)location.getLatitude());
+            session.setPrevious_lat((float) location.getLatitude());
             session.setPrevious_long((float)location.getLongitude());
-            seconds_count = 0;
-
             return dis_btw_latlong;
         }
         seconds_count = 0;
