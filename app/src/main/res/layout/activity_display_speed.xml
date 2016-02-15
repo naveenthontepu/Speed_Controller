@@ -38,7 +38,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start Speed ckecking"
+            android:text="Start Distance calculation"
             android:layout_marginBottom="15dp"
             style="@style/enteryButtonStyle"
             android:id="@+id/startButton"
@@ -47,7 +47,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Stop Speed Checking"
+            android:text="Stop Distance calculation"
             android:id="@+id/stopButton"
             android:layout_marginTop="15dp"
             style="@style/enteryButtonStyle"

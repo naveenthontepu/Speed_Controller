@@ -18,6 +18,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class SpeedUpdatingService extends Service implements GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,LocationListener{
     public SpeedUpdatingService() {
@@ -32,6 +35,8 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
     protected LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     SessionSharedPrefs session;
+    int seconds_count = 0;
+    Timer timer;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -45,6 +50,14 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
         };
         Thread GoogleClientThread = new Thread(r);
         GoogleClientThread.start();
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                seconds_count = seconds_count+1;
+            }
+        };
+        timer.schedule(task,0,1000);
         return Service.START_STICKY;
     }
     protected synchronized void buildGoogleApiClient(){
@@ -133,13 +146,17 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
         previous_lat.setLongitude(session.getPrevious_long());
         float dis_btw_latlong = previous_lat.distanceTo(location);
         Log.i("distance","cal distance got = "+dis_btw_latlong);
+        Log.i("distance","seconds count  = "+seconds_count);
 
-        if (dis_btw_latlong>10&&dis_btw_latlong<80&&location.getSpeed()>.8){
+        if (dis_btw_latlong>10&&dis_btw_latlong<40*seconds_count&&location.getSpeed()>.8){
 //            &&location.getSpeed()>0.5
             session.setPrevious_lat((float)location.getLatitude());
             session.setPrevious_long((float)location.getLongitude());
+            seconds_count = 0;
+
             return dis_btw_latlong;
         }
+        seconds_count = 0;
         return 0;
     }
 
@@ -152,5 +169,9 @@ public class SpeedUpdatingService extends Service implements GoogleApiClient.OnC
     public void onDestroy() {
         super.onDestroy();
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (timer!=null){
+            timer.cancel();
+            timer = null;
+        }
     }
 }
